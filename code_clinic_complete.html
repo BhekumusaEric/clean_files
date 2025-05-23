@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Clinic System - Complete Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            font-weight: bold;
+        }
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Terminal styles */
+        .terminal {
+            background-color: #2c3e50;
+            color: #f0f0f0;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        .prompt {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .command {
+            color: #f1c40f;
+        }
+        .output {
+            color: #ecf0f1;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .success {
+            color: #2ecc71;
+        }
+        .info {
+            color: #3498db;
+        }
+        .comment {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        /* Project structure styles */
+        .folder-structure {
+            font-family: monospace;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+        .folder {
+            margin-left: 20px;
+        }
+        .folder-name {
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .folder-name:before {
+            content: "📁 ";
+        }
+        .folder-name.open:before {
+            content: "📂 ";
+        }
+        .file {
+            margin-left: 40px;
+            cursor: pointer;
+            color: #2980b9;
+            padding: 5px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+            display: block;
+            margin-top: 5px;
+        }
+        .file:before {
+            content: "📄 ";
+        }
+        .file-content {
+            display: none;
+            background-color: #f9f9f9;
+            border-left: 3px solid #3498db;
+            padding: 15px;
+            margin: 10px 0 10px 40px;
+            border-radius: 0 5px 5px 0;
+            overflow-x: auto;
+        }
+        .file-content.show {
+            display: block;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-explanation {
+            background-color: #f0f7fb;
+            border-left: 3px solid #3498db;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .explanation {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Code Clinic System - Complete Guide</h1>
+            <p>A comprehensive guide to the Code Clinic system, including project structure and CLI usage</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="section">
+            <h2>Code Clinic System</h2>
+            <p>The Code Clinic system facilitates peer-to-peer learning by allowing students to volunteer their time to help other students with coding problems. The system integrates with Google Calendar to manage bookings and availability.</p>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('project-structure')">Project Structure</div>
+                <div class="tab" onclick="showTab('volunteer-cli')">Volunteer Commands</div>
+                <div class="tab" onclick="showTab('student-cli')">Student Commands</div>
+                <div class="tab" onclick="showTab('admin-cli')">Admin Commands</div>
+            </div>
+            
+            <div class="tab-content active" id="project-structure">
+                <h3>Project Files and Structure</h3>
+                <p>This section provides a detailed overview of the project's file structure, including code samples and explanations for each file.</p>
+                
+                <div class="folder-structure">
+                    <div class="folder">
+                        <div class="folder-name open" onclick="toggleFolder(this)">code_clinic_project</div>
+                        
+                        <div class="file" onclick="toggleFile('clinic-py')">clinic.py - Main System Module</div>
+                        <div class="file-content" id="clinic-py">
+                            <pre><code>
+# clinic.py - Main Code Clinic System Module
+
+import datetime
+import json
+import os
+from volunteer import Volunteer
+from calendar_sync import get_calendar_events, create_event
+from config import load_config, save_config
+
+DATA_FILE = "data.json"
+
+class CodeClinic:
+    def __init__(self):
+        """Initialize the Code Clinic system"""
+        self.volunteers = {}
+        self.bookings = []
+        self.volunteer_slots = []
+        self.load_data()
+        
+    def load_data(self):
+        """Load data from the data file"""
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'r') as f:
+                data = json.load(f)
+                self.bookings = data.get('bookings', [])
+                self.volunteer_slots = data.get('volunteer_slots', [])
+                
+    def save_data(self):
+        """Save data to the data file"""
+        data = {
+            'bookings': self.bookings,
+            'volunteer_slots': self.volunteer_slots
+        }
+        with open(DATA_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+            
+    def register_volunteer(self, name, age, gender, student_no, email):
+        """Register a new volunteer"""
+        volunteer = Volunteer(name, age, gender, student_no, email)
+        self.volunteers[email] = volunteer
+        return volunteer
+</code></pre>
+                            <div class="code-explanation">
+                                <h4>Explanation:</h4>
+                                <p>The <code>clinic.py</code> file is the main module of the Code Clinic system. It provides the core functionality for managing volunteers, bookings, and time slots.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="file" onclick="toggleFile('volunteer-py')">volunteer.py - Volunteer Management</div>
+                        <div class="file-content" id="volunteer-py">
+                            <pre><code>
+# volunteer.py - Volunteer Management Module
+
+class Volunteer:
+    def __init__(self, name, age, gender, student_no, email):
+        """Initialize a volunteer with personal details"""
+        self.name = name
+        self.age = age
+        self.gender = gender
+        self.student_no = student_no
+        self.email = email
+        self.availability = []
+        
+    def choose_dates_whenavailable(self, dates):
+        """Add available dates for volunteering"""
+        # Validate dates format
+        valid_dates = []
+        for date in dates:
+            # Add validation logic here
+            valid_dates.append(date)
+            
+        # Update availability
+        self.availability.extend(valid_dates)
+        return True
+</code></pre>
+                            <div class="code-explanation">
+                                <h4>Explanation:</h4>
+                                <p>The <code>volunteer.py</code> file contains the Volunteer class, which represents a student who offers their time to help others with coding problems.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="file" onclick="toggleFile('calendar-sync-py')">calendar_sync.py - Google Calendar Integration</div>
+                        <div class="file-content" id="calendar-sync-py">
+                            <pre><code>
+# calendar_sync.py - Google Calendar Integration Module
+
+import datetime
+import os.path
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+# If modifying these scopes, delete the file token.json.
+SCOPES = ["https://www.googleapis.com/auth/calendar.events"]
+
+def get_credentials():
+    """Get credentials for Google Calendar API"""
+    creds = None
+    # The file token.json stores the user's access and refresh tokens
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "secrets/credentials.json", SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())
+    return creds
+</code></pre>
+                            <div class="code-explanation">
+                                <h4>Explanation:</h4>
+                                <p>The <code>calendar_sync.py</code> file handles integration with Google Calendar API, allowing the system to create, update, and delete events in users' calendars.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="file" onclick="toggleFile('config-py')">config.py - Configuration Management</div>
+                        <div class="file-content" id="config-py">
+                            <pre><code>
+# config.py - Configuration Management Module
+
+import os
+import json
+
+CONFIG_FILE = os.path.expanduser("~/.code_clinic_config")
+
+def load_config():
+    """Load configuration from the config file"""
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_config(config_data):
+    """Save configuration to the config file"""
+    with open(CONFIG_FILE, 'w') as f:
+        json.dump(config_data, f, indent=2)
+</code></pre>
+                            <div class="code-explanation">
+                                <h4>Explanation:</h4>
+                                <p>The <code>config.py</code> file provides functionality for managing system configuration settings, storing them in a JSON file in the user's home directory.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="file" onclick="toggleFile('cli-py')">cli.py - Command Line Interface</div>
+                        <div class="file-content" id="cli-py">
+                            <pre><code>
+# cli.py - Command Line Interface Module
+
+import argparse
+import sys
+from clinic import CodeClinic
+from utils import validate_email, validate_date, validate_time
+
+def parse_args():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description='Code Clinic CLI')
+    subparsers = parser.add_subparsers(dest='command', help='Command to run')
+    
+    # Register volunteer command
+    register_parser = subparsers.add_parser('register', help='Register as a volunteer')
+    register_parser.add_argument('--name', required=True, help='Volunteer name')
+    register_parser.add_argument('--age', required=True, type=int, help='Volunteer age')
+    register_parser.add_argument('--gender', required=True, help='Volunteer gender')
+    register_parser.add_argument('--student-no', required=True, help='Student number')
+    register_parser.add_argument('--email', required=True, help='Email address')
+    
+    # Add slot command
+    slot_parser = subparsers.add_parser('add-slot', help='Add a volunteer time slot')
+    slot_parser.add_argument('--email', required=True, help='Volunteer email')
+    slot_parser.add_argument('--date', required=True, help='Date (YYYY-MM-DD)')
+    slot_parser.add_argument('--time', required=True, help='Time (HH:MM)')
+    slot_parser.add_argument('--duration', type=int, default=30, help='Duration in minutes')
+</code></pre>
+                            <div class="code-explanation">
+                                <h4>Explanation:</h4>
+                                <p>The <code>cli.py</code> file provides a command-line interface for interacting with the Code Clinic system, allowing users to register, add slots, book sessions, and view information.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="volunteer-cli">
+                <h3>Volunteer CLI Commands</h3>
+                
+                <div class="explanation">
+                    <p>As a volunteer, you can register yourself, add available time slots, and manage your bookings using the following commands.</p>
+                </div>
+                
+                <h4>1. Registering as a Volunteer</h4>
+                <div class="terminal">
+<span class="prompt">user@wethinkcode:~$</span> <span class="command">python clinic.py register --name "John Doe" --age 25 --gender "Male" --student-no "WTC_12345" --email "john.doe@example.com"</span>
+
+<span class="success">Volunteer registered: John Doe (john.doe@example.com) - Student #WTC_12345</span>
+                </div>
+                
+                <h4>2. Adding Available Time Slots</h4>
+                <div class="terminal">
+<span class="prompt">user@wethinkcode:~$</span> <span class="command">python clinic.py add-slot --email "john.doe@example.com" --date "2023-06-01" --time "14:00" --duration 30</span>
+
+<span class="success">Slot added: 2023-06-01 14:00 (30 minutes)</span>
+                </div>
+                
+                <h4>3. Viewing Your Available Slots</h4>
+                <div class="terminal">
+<span class="prompt">user@wethinkcode:~$</span> <span class="command">python clinic.py list-slots --volunteer "john.doe@example.com"</span>
+
+<span class="output">Available slots for John Doe:</span>
+<span class="output">1: 2023-06-01 14:00 - 14:30 (Available)</span>
+<span class="output">2: 2023-06-03 10:00 - 10:45 (Available)</span>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="student-cli">
+                <h3>Student CLI Commands</h3>
+                
+                <div class="explanation">
+                    <p>As a student, you can view available slots, book sessions, and manage your bookings using the following commands.</p>
+                </div>
+                
+                <h4>1. Viewing Available Slots</h4>
+                <div class="terminal">
+<span class="prompt">user@wethinkcode:~$</span> <span class="command">python clinic.py list-slots</span>
+
+<span class="output">Available slots:</span>
+<span class="output">0: 2023-06-01 14:00 - 14:30 (John Doe)</span>
+<span class="output">1: 2023-06-03 10:00 - 10:45 (John Doe)</span>
+<span class="output">2: 2023-06-07 11:00 - 12:00 (Jane Smith)</span>
+                </div>
+                
+                <h4>2. Booking a Slot</h4>
+                <div class="terminal">
+<span class="prompt">user@wethinkcode:~$</span> <span class="command">python clinic.py book --email "alice@example.com" --slot-index 0 --description "Help with Python classes and inheritance"</span>
+
+<span class="success">Slot booked successfully</span>
+<span class="info">Booking details:</span>
+<span class="output">Date: 2023-06-01</span>
+<span class="output">Time: 14:00 - 14:30</span>
+<span class="output">Volunteer: John Doe (john.doe@example.com)</span>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="admin-cli">
+                <h3>Admin CLI Commands</h3>
+                
+                <div class="explanation">
+                    <p>As an administrator, you can manage the entire system, view all bookings, and perform maintenance tasks using the following commands.</p>
+                </div>
+                
+                <h4>1. Viewing All Volunteers</h4>
+                <div class="terminal">
+<span class="prompt">user@wethinkcode:~$</span> <span class="command">python clinic.py list-volunteers</span>
+
+<span class="output">Registered volunteers:</span>
+<span class="output">1. John Doe (john.doe@example.com) - Student #WTC_12345</span>
+<span class="output">2. Jane Smith (jane.smith@example.com) - Student #WTC_67890</span>
+                </div>
+                
+                <h4>2. Viewing All Slots</h4>
+                <div class="terminal">
+<span class="prompt">user@wethinkcode:~$</span> <span class="command">python clinic.py list-all-slots</span>
+
+<span class="output">All slots:</span>
+<span class="output">1. 2023-06-01 14:00 - 14:30 (John Doe) - Booked by alice@example.com</span>
+<span class="output">2. 2023-06-03 10:00 - 10:45 (John Doe) - Available</span>
+<span class="output">3. 2023-06-07 11:00 - 12:00 (Jane Smith) - Available</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Getting Started</h2>
+            <p>To use the Code Clinic system, follow these steps:</p>
+            <ol>
+                <li><strong>Clone the repository:</strong> <code>git clone https://github.com/wethinkcode/fun-ex-code-clinics.git</code></li>
+                <li><strong>Install dependencies:</strong> <code>pip install -r requirements.txt</code></li>
+                <li><strong>Set up Google Calendar API:</strong> Follow the instructions in the README to set up your Google Calendar API credentials</li>
+                <li><strong>Run the commands:</strong> Use the commands shown in the demo above to interact with the system</li>
+            </ol>
+            <p>For more information, refer to the project documentation or run <code>python clinic.py --help</code> to see all available commands and options.</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to show a tab
+        function showTab(tabId) {
+            // Hide all tab contents
+            var tabContents = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update tab styling
+            var tabs = document.getElementsByClassName('tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Find the clicked tab and make it active
+            var allTabs = document.getElementsByClassName('tab');
+            for (var i = 0; i < allTabs.length; i++) {
+                if (allTabs[i].getAttribute('onclick').includes(tabId)) {
+                    allTabs[i].classList.add('active');
+                }
+            }
+        }
+        
+        // Toggle folder open/closed
+        function toggleFolder(folderElement) {
+            folderElement.classList.toggle('open');
+            
+            // Get all siblings until the next folder
+            var sibling = folderElement.nextElementSibling;
+            while (sibling) {
+                if (sibling.classList.contains('folder-name')) {
+                    break;
+                }
+                
+                if (sibling.classList.contains('file')) {
+                    if (folderElement.classList.contains('open')) {
+                        sibling.style.display = 'block';
+                    } else {
+                        sibling.style.display = 'none';
+                    }
+                }
+                
+                sibling = sibling.nextElementSibling;
+            }
+        }
+        
+        // Toggle file content visibility
+        function toggleFile(fileId) {
+            var fileContent = document.getElementById(fileId);
+            if (fileContent) {
+                fileContent.classList.toggle('show');
+            }
+        }
+    </script>
+</body>
+</html>
